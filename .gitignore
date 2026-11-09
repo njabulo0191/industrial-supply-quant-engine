@@ -1,0 +1,27 @@
+# Qt Creator configuration
+*.user
+*.user.*
+.qtcreator/
+**/.qtcreator/
+
+# CMake build directories
+build/
+**/build/
+cmake-build-*/
+
+# Compiled C++ files
+*.exe
+*.o
+*.obj
+*.dll
+*.so
+
+# Code::Blocks generated files
+*.depend
+*.layout
+
+# VS Code local settings
+.vscode/
+
+# Log files
+*.log
