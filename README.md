@@ -38,14 +38,27 @@ industrial-supply-quant-engine/
 ├── supply_chain_gen.py
 ├── telemetry_processor.py
 ├── optimize_costs.m
+├── MATLAB_Engine/
+│   ├── run_analysis.m
+│   ├── optimize_costs.m
+│   ├── predict_material_prices.m
+│   ├── production_regression.m
+│   ├── calculate_EOQ.m
+│   ├── linear_programming.m
+│   ├── process_control.m
+│   ├── moving_average.m
+│   ├── gradient_descent.m
+│   ├── numerical_methods.m
+│   ├── functions/                 # compatibility helpers
+│   └── results/                   # generated locally; not committed
 │
-├── historical_material_tracking.csv
-├── industrial_supply_telemetry.csv
-├── optimized_strategy.txt
+├── telemetry/                     # local Qt log; not committed
 │
 ├── .gitignore
 └── README.md
 ```
+
+Telemetry logs, inventory snapshots, generated CSV reports, and plant-specific category settings are created locally and excluded from Git. No operational data is included in this repository.
 
 ## Main Components
 
@@ -86,13 +99,13 @@ The `optimize_costs.m` script provides a MATLAB component for exploring cost opt
 
 ```bash
 git clone https://github.com/njabulo0191/industrial-supply-quant-engine.git
-```bash
+```
 
 Navigate into the project:
 
 ```bash
 cd industrial-supply-quant-engine
-```bash
+```
 
 ### Run the Qt Application
 
@@ -102,28 +115,33 @@ cd industrial-supply-quant-engine
 4. Configure the project using an installed Qt kit.
 5. Build and run the application.
 
-### Run the Python Scripts
+### Python Data Tools
 
-From the project root:
-
-```bash
-python supply_chain_gen.py
-```
+The Qt application calls `telemetry_processor.py` after a material is recorded. To use the processor manually, first run the Qt app and capture an item, then run this from the project root:
 
 ```bash
 python telemetry_processor.py
 ```
 
-### Run the MATLAB Script
+`supply_chain_gen.py` is an optional standalone demo-data generator; it is separate from the Qt telemetry pipeline.
 
-Open MATLAB, navigate to the project directory, and execute:
+### Run the MATLAB Analysis Pipeline
+
+Capture or edit items in the Qt application first. Qt stores the action history in `historical_material_tracking.csv` and the latest state of each item in `current_inventory.csv`. MATLAB reads both files; the random-data `supply_chain_gen.py` simulator remains a separate demo source.
+
+From MATLAB, set the current folder to `MATLAB_Engine` and execute:
 
 ```matlab
-optimize_costs
+run_analysis
 ```
 
-*Note: These are initial run instructions based on the repository structure. Dependencies, input-file requirements, and exact execution behaviour should be verified against the source code.*
+Regression uses Qt event history. Material cost/efficiency screening uses current inventory and compares rows only within matching metric units. The Qt form does not capture throughput, so MATLAB does not calculate throughput metrics. EOQ uses annual demand, ordering cost, and holding cost entered for each item in Qt; leave all three blank to exclude that item. Inventory batch quantity is not treated as annual demand. The older `eoq_parameters.csv` is not used by this pipeline.
 
+`run_analysis` also creates `price_predictions.csv` and `production_analysis.csv` from the Qt event history. Price forecasts are linear trend extrapolations by production stream, material category, and exact variant; variants without at least two distinct timestamps are listed with an insufficient-history status. Production analysis reports event observations, latest recorded quantity, unit-cost trend, and efficiency. It does not estimate throughput because the Qt app does not collect production counts. The same run produces `process_control.csv` for efficiency and `moving_average.csv` for unit cost by variant.
+
+The standalone numerical modules are reusable functions. `linear_programming` solves a bounded procurement problem when items are interchangeable and use the same unit; the current Qt categories do not supply those constraints, so it is not run automatically. `gradient_descent` accepts an objective and its gradient. `numerical_methods` provides bisection and Newton root finding. `moving_average` returns a trailing moving average for a numeric vector.
+
+The Qt app opens with PET, RGB, RefPET, and Can stream choices, then shows that stream’s material categories. RefPET and RGB track syrup, labels, closures, bottles, crates, and pallets; Can tracks syrup, cans, top lids, shrinkwrapper, stretch wrapper, and pallets. PET keeps the existing categories. Selectors capture flavour, container size, and packaging colour where appropriate, and the editable choices allow line-specific variants. Custom categories and their SI/stock units are saved per stream in `material_categories.json`. MATLAB price-trend and performance outputs distinguish stream, category, and exact variant.
 ## Skills Demonstrated
 
 - Object-oriented programming with C++.

@@ -2,6 +2,18 @@ cmake_minimum_required(VERSION 3.16)
 
 project(SupplyChainProj VERSION 0.1 LANGUAGES CXX)
 
+get_filename_component(TELEMETRY_PROJECT_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
+file(TO_CMAKE_PATH "${TELEMETRY_PROJECT_ROOT}" TELEMETRY_PROJECT_ROOT)
+set(TELEMETRY_LOG_PATH "${TELEMETRY_PROJECT_ROOT}/telemetry/raw_interface_telemetry.log")
+file(TO_CMAKE_PATH "${TELEMETRY_LOG_PATH}" TELEMETRY_LOG_PATH)
+set(TELEMETRY_LEGACY_LOG_PATH "${CMAKE_CURRENT_BINARY_DIR}/raw_interface_telemetry.log")
+file(TO_CMAKE_PATH "${TELEMETRY_LEGACY_LOG_PATH}" TELEMETRY_LEGACY_LOG_PATH)
+configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/telemetry_project_path.h.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/telemetry_project_path.h"
+    @ONLY
+)
+
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -43,6 +55,7 @@ else()
 endif()
 
 target_link_libraries(SupplyChainProj PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
+target_include_directories(SupplyChainProj PRIVATE "${CMAKE_CURRENT_BINARY_DIR}")
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
 # If you are developing for iOS or macOS you should consider setting an

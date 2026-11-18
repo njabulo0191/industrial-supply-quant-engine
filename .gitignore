@@ -25,3 +25,21 @@ cmake-build-*/
 
 # Log files
 *.log
+
+# Local plant-specific category and unit definitions
+/material_categories.json
+
+# Generated telemetry, inventory, demo inputs, and analysis outputs.
+# Keep operational data local; the repository contains source only.
+/current_inventory.csv
+/historical_material_tracking.csv
+/industrial_supply_telemetry.csv
+/eoq_parameters.csv
+/optimized_strategy.txt
+/telemetry/*.log
+/results/
+/MATLAB_Engine/results/*
+
+# MATLAB autosaves and local review bundle
+*.asv
+/industrial-supply-source-review.zip
